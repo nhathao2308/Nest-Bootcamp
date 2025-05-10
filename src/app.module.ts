@@ -2,7 +2,12 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from './entities/user.entity';
+import { UserEntity } from './module/users/entities/user.entity';
+import { UsersModule } from './module/users/users.module';
+import { PetsModule } from './module/pets/pets.module';
+import { BreedsModule } from './module/breeds/breeds.module';
+import { PetEntity } from './module/pets/entities/pet.entity';
+import { BreedEntity } from './module/breeds/entities/breed.entity';
 // import { MongooseModule } from '@nestjs/mongoose';
 // import { Cat, CatSchema } from './schema/cat.schema';
 
@@ -17,10 +22,13 @@ import { UserEntity } from './entities/user.entity';
       username: 'postgres',
       password: 'hao@123',
       database: 'postgres',
-      entities: [UserEntity],
+      entities: [UserEntity, PetEntity, BreedEntity],
       synchronize: true,
     }),
     TypeOrmModule.forFeature([UserEntity]),
+    UsersModule,
+    PetsModule,
+    BreedsModule,
     //cau hinh mongo
     // MongooseModule.forRoot('mongodb://haven:Hao2308@localhost:27019'),
     // MongooseModule.forFeature([{ name: Cat.name, schema: CatSchema }]),
