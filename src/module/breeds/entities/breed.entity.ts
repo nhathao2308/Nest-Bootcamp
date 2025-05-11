@@ -20,10 +20,10 @@ export class BreedEntity {
   description: string;
 
   @Column()
-  baseGrowthRate: string;
+  location: string;
 
-  @Column({ nullable: true })
-  specialCharacteristics: string;
+  @Column()
+  lifespan: number;
 
   @Column({ default: 'activate' })
   status: string;

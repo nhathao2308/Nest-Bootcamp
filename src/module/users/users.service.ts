@@ -3,12 +3,16 @@ import {
   Injectable,
   HttpStatus,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PasswordUtil } from 'src/utils/password.util';
+import { LoginUserDto } from './dto/login-user.dto';
+import { JwtUtil } from 'src/utils/jwt.util';
 
 @Injectable()
 export class UsersService {
@@ -18,6 +22,8 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    private readonly passwordUtil: PasswordUtil,
+    private readonly jwtUtil: JwtUtil,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -29,8 +35,57 @@ export class UsersService {
       throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST);
     }
 
-    const newUser = this.userRepository.create(createUserDto);
+    const hashedPassword = await this.passwordUtil.hashPassword(
+      createUserDto.password,
+    );
+
+    const newUser = this.userRepository.create({
+      ...createUserDto,
+      password: hashedPassword,
+    });
+
     return await this.userRepository.save(newUser);
+  }
+
+  async login(loginUserDto: LoginUserDto) {
+    const user = await this.userRepository.findOne({
+      where: { email: loginUserDto.email },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const isPasswordValid = await this.passwordUtil.comparePassword({
+      plainPassword: loginUserDto.password,
+      hashedPassword: user.password,
+    });
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    if (user.status === 'inactivate') {
+      throw new UnauthorizedException('Account is inactive');
+    }
+
+    // const payload = {
+    //   sub: user.id,
+    //   email: user.email,
+    //   fullName: user.fullName,
+    // };
+
+    const token = this.jwtUtil.sign(loginUserDto);
+
+    return {
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        gender: user.gender,
+      },
+    };
   }
 
   async getAll(): Promise<UserEntity[]> {

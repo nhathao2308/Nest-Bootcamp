@@ -26,12 +26,14 @@ export class BreedsService {
     const breed = new BreedEntity();
     breed.name = createBreedDto.name;
     breed.description = createBreedDto.description;
-    breed.baseGrowthRate = createBreedDto.baseGrowthRate;
-    if (createBreedDto.specialCharacteristics) {
-      breed.specialCharacteristics = createBreedDto.specialCharacteristics;
-    }
+    breed.lifespan = createBreedDto.lifespan;
+    breed.location = createBreedDto.location;
     breed.status = 'activate';
 
     return await this.breedRepository.save(breed);
+  }
+
+  async getAllBreed(): Promise<BreedEntity[]> {
+    return await this.breedRepository.find();
   }
 }

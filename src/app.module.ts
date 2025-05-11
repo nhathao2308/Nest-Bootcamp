@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,11 +8,14 @@ import { PetsModule } from './module/pets/pets.module';
 import { BreedsModule } from './module/breeds/breeds.module';
 import { PetEntity } from './module/pets/entities/pet.entity';
 import { BreedEntity } from './module/breeds/entities/breed.entity';
+import { ConfigModule } from '@nestjs/config';
+import { APP_PIPE } from '@nestjs/core';
 // import { MongooseModule } from '@nestjs/mongoose';
 // import { Cat, CatSchema } from './schema/cat.schema';
 
 @Module({
   imports: [
+    //====================Database=================================================================
     //import module vao
     //cau hinh Orm
     TypeOrmModule.forRoot({
@@ -32,8 +35,19 @@ import { BreedEntity } from './module/breeds/entities/breed.entity';
     //cau hinh mongo
     // MongooseModule.forRoot('mongodb://haven:Hao2308@localhost:27019'),
     // MongooseModule.forFeature([{ name: Cat.name, schema: CatSchema }]),
+
+    //======================Config==========================================================
+    ConfigModule.forRoot({
+      isGlobal: true, // Cho phép dùng ở bất kỳ đâu
+    }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
+    },
+  ],
 })
 export class AppModule {}

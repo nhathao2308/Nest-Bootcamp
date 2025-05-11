@@ -6,6 +6,8 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
@@ -24,6 +26,15 @@ export class PetEntity {
 
   @Column()
   description: string;
+
+  @Column({ default: 'activate' })
+  status: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @ManyToOne(() => UserEntity, (user) => user.pets)
   @JoinColumn()

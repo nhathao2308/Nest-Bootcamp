@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 import { BreedsService } from './breeds.service';
 import { CreateBreedDto } from './dto/create-breed.dto';
 import { BreedEntity } from './entities/breed.entity';
@@ -10,5 +10,10 @@ export class BreedsController {
   @Post()
   async create(@Body() createBreedDto: CreateBreedDto): Promise<BreedEntity> {
     return await this.breedsService.create(createBreedDto);
+  }
+
+  @Get()
+  async get(): Promise<BreedEntity[]> {
+    return await this.breedsService.getAllBreed();
   }
 }

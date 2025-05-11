@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
 
 export class CreateBreedDto {
   @IsString()
@@ -9,11 +9,11 @@ export class CreateBreedDto {
   @IsNotEmpty()
   description: string;
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  baseGrowthRate: string;
+  lifespan: number;
 
   @IsString()
   @IsOptional()
-  specialCharacteristics?: string;
+  location: string;
 }
