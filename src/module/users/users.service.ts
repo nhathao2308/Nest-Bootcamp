@@ -69,13 +69,13 @@ export class UsersService {
       throw new UnauthorizedException('Account is inactive');
     }
 
-    // const payload = {
-    //   sub: user.id,
-    //   email: user.email,
-    //   fullName: user.fullName,
-    // };
+    const payload = {
+      email: user.email,
+      fullName: user.fullName,
+      role: 'user',
+    };
 
-    const token = this.jwtUtil.sign(loginUserDto);
+    const token = this.jwtUtil.sign(payload);
 
     return {
       token,

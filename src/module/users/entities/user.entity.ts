@@ -25,6 +25,9 @@ export class UserEntity {
   @Column()
   gender: string;
 
+  @Column({ default: 'user' })
+  role: string;
+
   @Column({ default: 'activate' })
   status: string;
 

@@ -6,13 +6,17 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
-import * as jwt from 'jsonwebtoken';
+import { JwtUtil } from '../utils/jwt.util';
 
 @Injectable()
 export class JwtGuard implements CanActivate {
+  constructor(private readonly jwtUtil: JwtUtil) {}
+
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
     const authHeader = request.headers['authorization'];
+
+    console.log(authHeader);
 
     // lay header ra
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -24,10 +28,10 @@ export class JwtGuard implements CanActivate {
     const token = authHeader.split(' ')[1];
 
     try {
-      const payload = jwt.verify(token, 'cuongdz'); // hoặc process.env.JWT_SECRET
+      const payload = this.jwtUtil.verify(token);
       request['user'] = payload; // đính kèm user vào request
       return true;
-    } catch (err) {
+    } catch {
       throw new UnauthorizedException('Invalid or expired token');
     }
   }
