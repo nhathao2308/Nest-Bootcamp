@@ -14,6 +14,11 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { TransformInterceptor } from './transform.interceptor';
 // import { HttpExceptionFilter } from './exception.filter';
 import { AllExceptionsFilter } from './exception.filter';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
+import { GraphqlModule } from './graphql-demo/graphql-demo.module';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 // import { MongooseModule } from '@nestjs/mongoose';
 // import { Cat, CatSchema } from './schema/cat.schema';
 
@@ -36,9 +41,18 @@ import { AllExceptionsFilter } from './exception.filter';
     UsersModule,
     PetsModule,
     BreedsModule,
+    GraphqlModule,
     //cau hinh mongo
     // MongooseModule.forRoot('mongodb://haven:Hao2308@localhost:27019'),
     // MongooseModule.forFeature([{ name: Cat.name, schema: CatSchema }]),
+
+    //======================Graphql=========================================================
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      playground: false,
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+    }),
 
     //======================Config==========================================================
     ConfigModule.forRoot({
@@ -48,23 +62,24 @@ import { AllExceptionsFilter } from './exception.filter';
   controllers: [AppController],
   providers: [
     AppService,
+
     // dang ki cai validation pipe o global scope - ap dung cho toan bo app
-    {
-      provide: APP_PIPE,
-      useClass: ValidationPipe,
-    },
+    // {
+    //   provide: APP_PIPE,
+    //   useClass: ValidationPipe,
+    // },
     // {
     //   provide: APP_INTERCEPTOR,
     //   useClass: LoggingInterceptor,
     // },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: TransformInterceptor,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
-    },
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: TransformInterceptor,
+    // },
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: AllExceptionsFilter,
+    // },
   ],
 })
 export class AppModule {}
