@@ -3,21 +3,33 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
-  UnauthorizedException,
   ForbiddenException,
 } from '@nestjs/common';
+import { JwtGuard } from './jwt.guard';
+import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { JwtUtil } from '../utils/jwt.util';
-import { Reflector } from '@nestjs/core';
+
+interface UserPayload {
+  role: string;
+  [key: string]: any;
+}
 
 @Injectable()
-export class RoleGuard implements CanActivate {
+export class RoleGuard extends JwtGuard implements CanActivate {
   constructor(
-    private readonly jwtUtil: JwtUtil,
     private readonly reflector: Reflector,
-  ) {}
+    jwtUtil: JwtUtil,
+  ) {
+    super(jwtUtil);
+  }
 
   canActivate(context: ExecutionContext): boolean {
+    const isJwtValid = super.canActivate(context);
+    if (!isJwtValid) {
+      return false;
+    }
+
     const requiredRoles = this.reflector.get<string[]>(
       'roles',
       context.getHandler(),
@@ -26,33 +38,16 @@ export class RoleGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest<Request>();
-    const authHeader = request.headers['authorization'];
+    const request = context
+      .switchToHttp()
+      .getRequest<Request & { user: UserPayload }>();
+    const user = request.user;
 
-    // lay header ra
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedException(
-        'Missing or invalid Authorization header',
-      );
+    const hasRole = requiredRoles.includes(user.role);
+    if (!hasRole) {
+      throw new ForbiddenException('You do not have permissions to access');
     }
 
-    const token = authHeader.split(' ')[1];
-
-    try {
-      const payload = this.jwtUtil.verify(token);
-      const hasRole = requiredRoles.includes(payload.role);
-
-      if (!hasRole) {
-        throw new ForbiddenException('You do not have permissions to access');
-      }
-
-      request['user'] = payload;
-      return true;
-    } catch (error) {
-      if (error instanceof ForbiddenException) {
-        throw error;
-      }
-      throw new UnauthorizedException('Invalid or expired token');
-    }
+    return true;
   }
 }
