@@ -1,24 +1,26 @@
-import { Module, ValidationPipe } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from './module/users/entities/user.entity';
-import { UsersModule } from './module/users/users.module';
-import { PetsModule } from './module/pets/pets.module';
-import { BreedsModule } from './module/breeds/breeds.module';
-import { PetEntity } from './module/pets/entities/pet.entity';
-import { BreedEntity } from './module/breeds/entities/breed.entity';
-import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { Module } from '@nestjs/common';
+// import { AppController } from './app.controller';
+// import { AppService } from './app.service';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { ConfigService } from '@nestjs/config';
+// import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 // import { LoggingInterceptor } from './logging.interceptor';
-import { TransformInterceptor } from './transform.interceptor';
+// import { TransformInterceptor } from './interceptor/transform.interceptor';
 // import { HttpExceptionFilter } from './exception.filter';
-import { AllExceptionsFilter } from './exception.filter';
+// import { AllExceptionsFilter } from './exception.filter';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
-import { GraphqlModule } from './graphql-demo/graphql-demo.module';
+// import { GraphqlModule } from './graphql-demo/graphql-demo.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { UserModule } from './module/user/user.module';
+import { DatabaseModule } from './database/database.module';
+import { AppConfigModule } from './config/config.module';
+import { User } from './module/user/user.entity';
+import { CategoriesModule } from './module/categories/categories.module';
+import { SpeciesModule } from './module/species/species.module';
+import { Categories } from './module/categories/categories.entity';
+import { Species } from './module/species/species.entity';
 // import { MongooseModule } from '@nestjs/mongoose';
 // import { Cat, CatSchema } from './schema/cat.schema';
 
@@ -27,26 +29,30 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
     //====================Database=================================================================
     //import module vao
     //cau hinh Orm
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5435,
-      username: 'postgres',
-      password: 'hao@123',
-      database: 'postgres',
-      entities: [UserEntity, PetEntity, BreedEntity],
-      synchronize: true,
+    DatabaseModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService): TypeOrmModuleOptions => ({
+        type: 'postgres',
+        host: config.get('DB_HOST'),
+        port: config.get<number>('DB_PORT'),
+        username: config.get('DB_USER'),
+        password: config.get('DB_PASS'),
+        database: config.get('DB_NAME'),
+        entities: [User, Categories, Species],
+        synchronize: true,
+      }),
     }),
-    TypeOrmModule.forFeature([UserEntity]),
-    UsersModule,
-    PetsModule,
-    BreedsModule,
-    GraphqlModule,
+    //====================EntityModule=================================================================
+    UserModule,
+    CategoriesModule,
+    SpeciesModule,
+    // GraphqlModule,
     //cau hinh mongo
     // MongooseModule.forRoot('mongodb://haven:Hao2308@localhost:27019'),
     // MongooseModule.forFeature([{ name: Cat.name, schema: CatSchema }]),
 
     //======================Graphql=========================================================
+    AppConfigModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
@@ -55,14 +61,8 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
     }),
 
     //======================Config==========================================================
-    ConfigModule.forRoot({
-      isGlobal: true, // Cho phép dùng ở bất kỳ đâu
-    }),
   ],
-  controllers: [AppController],
   providers: [
-    AppService,
-
     // dang ki cai validation pipe o global scope - ap dung cho toan bo app
     // {
     //   provide: APP_PIPE,
