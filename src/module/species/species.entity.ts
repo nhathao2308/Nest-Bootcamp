@@ -4,12 +4,13 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { AnimalType } from '../../enums/animal-type.enum';
 import { Categories } from '../categories/categories.entity';
-
+import { Product } from '../products/products.entity';
 @ObjectType()
 @Entity()
 export class Species {
@@ -63,4 +64,8 @@ export class Species {
   @ManyToOne(() => Categories, (category) => category.species)
   @Field(() => Categories)
   category: Categories;
+
+  @OneToMany(() => Product, (product) => product.species)
+  @Field(() => [Product])
+  products: Product[];
 }

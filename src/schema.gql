@@ -2,15 +2,15 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type User {
+type Categories {
   id: String!
-  email: String!
-  password: String!
-  first_name: String!
-  last_name: String!
-  phone: String!
+  name: String!
+  image_url: String!
+  is_active: Boolean!
+  description: String!
   created_at: DateTime!
   updated_at: DateTime!
+  species: [Species!]!
 }
 
 """
@@ -31,6 +31,7 @@ type Species {
   created_at: DateTime!
   updated_at: DateTime!
   category: Categories!
+  products: [Product!]!
 }
 
 """The type of animal"""
@@ -39,24 +40,74 @@ enum AnimalType {
   SPIDER
 }
 
-type Categories {
+type Product {
   id: String!
   name: String!
-  image_url: String!
-  is_active: Boolean!
-  description: String!
+  common_name: String
+  size: String
+  gender: String
+  weight: Float
+  description: String
+  stock_quantity: Int!
+  is_available: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
-  species: [Species!]!
+  species: Species!
+  orders: [Order!]!
+}
+
+type Order {
+  id: String!
+  order_date: DateTime!
+  payment_method: String!
+  shipping_cost: Float!
+  subtotal: Float!
+  total_amount: Float!
+  order_status: Status!
+  payment_status: Status!
+  note: String
+  cancel_reason: String
+  created_at: DateTime!
+  updated_at: DateTime!
+  buyer: User!
+  product: Product!
+}
+
+"""The status """
+enum Status {
+  Active
+  Inactive
+  Pending
+  Cancelled
+  Completed
+  Failed
+  Refunded
+  Disputed
+  OnHold
+}
+
+type User {
+  id: String!
+  email: String!
+  password: String!
+  first_name: String!
+  last_name: String!
+  phone: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+  orders: [Order!]!
 }
 
 type Query {
   users: [User!]!
   user(id: String!): User!
+  getAllCategories: [Categories!]!
+  getCategoryById(id: String!): Categories!
 }
 
 type Mutation {
   createCategory(category: CreateCategoryInput!): Categories!
+  createSpecies(speciesInput: CreateSpeciesInput!): Species!
 }
 
 input CreateCategoryInput {
@@ -64,4 +115,23 @@ input CreateCategoryInput {
   image_url: String!
   is_active: Boolean! = true
   description: String!
+}
+
+input CreateSpeciesInput {
+  scientific_name: String!
+  common_name: String!
+  family: String!
+  genus: String!
+  animal_type: AnimalType!
+  origin: String!
+  care_level: CareLevel!
+  description: String!
+  category_id: String!
+}
+
+"""The care level of the animal"""
+enum CareLevel {
+  LOW
+  MEDIUM
+  HIGH
 }
