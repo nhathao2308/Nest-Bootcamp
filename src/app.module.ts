@@ -21,6 +21,10 @@ import { CategoriesModule } from './module/categories/categories.module';
 import { SpeciesModule } from './module/species/species.module';
 import { Categories } from './module/categories/categories.entity';
 import { Species } from './module/species/species.entity';
+import { Product } from './module/products/products.entity';
+import { Order } from './module/orders/entities/order.entity';
+import { ProductsModule } from './module/products/products.module';
+import { OrdersModule } from './module/orders/orders.module';
 // import { MongooseModule } from '@nestjs/mongoose';
 // import { Cat, CatSchema } from './schema/cat.schema';
 
@@ -38,7 +42,7 @@ import { Species } from './module/species/species.entity';
         username: config.get('DB_USER'),
         password: config.get('DB_PASS'),
         database: config.get('DB_NAME'),
-        entities: [User, Categories, Species],
+        entities: [User, Categories, Species, Product, Order],
         synchronize: true,
       }),
     }),
@@ -46,6 +50,8 @@ import { Species } from './module/species/species.entity';
     UserModule,
     CategoriesModule,
     SpeciesModule,
+    ProductsModule,
+    OrdersModule,
     // GraphqlModule,
     //cau hinh mongo
     // MongooseModule.forRoot('mongodb://haven:Hao2308@localhost:27019'),

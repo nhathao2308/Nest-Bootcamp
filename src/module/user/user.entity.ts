@@ -3,9 +3,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Order } from '../orders/entities/order.entity';
 
 @ObjectType()
 @Entity()
@@ -41,4 +43,8 @@ export class User {
   @UpdateDateColumn()
   @Field(() => Date)
   updated_at: Date;
+
+  @OneToMany(() => Order, (order) => order.buyer)
+  @Field(() => [Order])
+  orders: Order[];
 }
