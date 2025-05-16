@@ -1,6 +1,7 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { User } from './user.entity';
+import { RegisterInput } from './dto/register.input';
 
 @Resolver()
 export class UserResolver {
@@ -14,5 +15,10 @@ export class UserResolver {
   @Query(() => User)
   user(@Args('id') id: string) {
     return this.userService.findOne(id);
+  }
+
+  @Mutation(() => User)
+  register(@Args('registerInput') registerInput: RegisterInput) {
+    return this.userService.register(registerInput);
   }
 }

@@ -25,6 +25,7 @@ import { Product } from './module/products/products.entity';
 import { Order } from './module/orders/entities/order.entity';
 import { ProductsModule } from './module/products/products.module';
 import { OrdersModule } from './module/orders/orders.module';
+import { JwtModule } from '@nestjs/jwt';
 // import { MongooseModule } from '@nestjs/mongoose';
 // import { Cat, CatSchema } from './schema/cat.schema';
 
@@ -58,7 +59,7 @@ import { OrdersModule } from './module/orders/orders.module';
     // MongooseModule.forFeature([{ name: Cat.name, schema: CatSchema }]),
 
     //======================Graphql=========================================================
-    AppConfigModule,
+
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
@@ -67,6 +68,8 @@ import { OrdersModule } from './module/orders/orders.module';
     }),
 
     //======================Config==========================================================
+    AppConfigModule,
+    JwtModule,
   ],
   providers: [
     // dang ki cai validation pipe o global scope - ap dung cho toan bo app
