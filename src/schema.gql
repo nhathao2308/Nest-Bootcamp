@@ -107,6 +107,7 @@ type Query {
 
 type Mutation {
   register(registerInput: RegisterInput!): User!
+  login(loginInput: LoginInput!): String!
   createCategory(category: CreateCategoryInput!): Categories!
   createSpecies(speciesInput: CreateSpeciesInput!): Species!
 }
@@ -117,6 +118,11 @@ input RegisterInput {
   first_name: String!
   last_name: String!
   phone: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
 }
 
 input CreateCategoryInput {

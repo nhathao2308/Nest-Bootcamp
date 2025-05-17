@@ -25,7 +25,11 @@ import { Product } from './module/products/products.entity';
 import { Order } from './module/orders/entities/order.entity';
 import { ProductsModule } from './module/products/products.module';
 import { OrdersModule } from './module/orders/orders.module';
-import { JwtModule } from '@nestjs/jwt';
+// import { JwtModule as NestJwtModule } from '@nestjs/jwt';
+import { PassportModule } from './services/auth/passport.module';
+// import { PassportModule } from '@nestjs/passport';
+// import { APP_GUARD } from '@nestjs/core';
+// import { JwtAuthGuard } from './services/auth/jwt-auth.guard';
 // import { MongooseModule } from '@nestjs/mongoose';
 // import { Cat, CatSchema } from './schema/cat.schema';
 
@@ -69,10 +73,14 @@ import { JwtModule } from '@nestjs/jwt';
 
     //======================Config==========================================================
     AppConfigModule,
-    JwtModule,
+    PassportModule,
   ],
   providers: [
     // dang ki cai validation pipe o global scope - ap dung cho toan bo app
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: JwtAuthGuard,
+    // },
     // {
     //   provide: APP_PIPE,
     //   useClass: ValidationPipe,

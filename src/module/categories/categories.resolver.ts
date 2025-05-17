@@ -2,6 +2,8 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CategoriesService } from './categories.service';
 import { Categories } from './categories.entity';
 import { CreateCategoryInput } from './dto/create-category.input';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/services/auth/jwt-auth.guard';
 
 @Resolver()
 export class CategoriesResolver {
@@ -13,7 +15,7 @@ export class CategoriesResolver {
   ): Promise<Categories> {
     return this.categoriesService.createCategory(category);
   }
-
+  @UseGuards(JwtAuthGuard)
   @Query(() => [Categories])
   async getAllCategories(): Promise<Categories[]> {
     return this.categoriesService.getAllCategories();

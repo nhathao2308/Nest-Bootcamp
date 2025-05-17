@@ -7,17 +7,17 @@ import {
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuthService } from 'src/services/auth/auth.service';
+// import { AuthService } from 'src/services/auth/auth.service';
 import { RegisterInput } from './dto/register.input';
 import { PasswordUtil } from 'src/utils/password.util';
 import { LoginInput } from './dto/login.input';
-
+import * as jwt from 'jsonwebtoken';
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly authService: AuthService,
+    // private readonly authService: AuthService,
     private readonly passwordUtil: PasswordUtil,
   ) {}
 
@@ -58,11 +58,31 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    if (user.password !== password) {
+
+    console.log(user);
+
+    const isPasswordValid = await this.passwordUtil.comparePassword({
+      plainPassword: password,
+      hashedPassword: user.password,
+    });
+    if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid password');
     }
 
-    const access_token = await this.authService.login(user);
+    console.log(user);
+
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      username: `${user.first_name} ${user.last_name}`,
+    };
+
+    const access_token = jwt.sign(payload, 'haodz', {
+      expiresIn: '1h',
+    });
+
+    console.log(access_token);
+
     return access_token;
   }
 }
